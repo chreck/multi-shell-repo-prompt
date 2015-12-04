@@ -182,6 +182,13 @@ function repo_status {
 		local lstatus=''
 	fi
 
+	# stash / shelve status of current rep
+	if in_git_repo; then
+		local stash="`git stash list 2>/dev/null | wc -l | sed  's/ //g'`"
+	else
+		local stash='0'
+	fi
+
 	local status_count=`echo "$lstatus" | wc -l | awk '{print $1}'`
 	
 	# if there's anything to report on...
@@ -247,6 +254,14 @@ function repo_status {
 				changes="${changes}, "
 			fi
 			changes="${changes}${staged} staged"
+		fi
+		
+		# stashed
+		if [[ "$stash" -gt 0 ]]; then
+			if [[ "$changes" != "" ]]; then
+				changes="${changes}, "
+			fi
+			changes="${changes}${stash} stashed"
 		fi
 		
 		if [[ "$changes" != "" ]]; then
